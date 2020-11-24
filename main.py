@@ -62,8 +62,8 @@ system = ''               # TODO: Put the system that it will use.
 apiBaseUrl = ''   # TODO: Put base API URL.
 idOffice = ''   
 
-Window.fullscreen = True
-#Window.size = (1245, 700)
+#Window.fullscreen = True
+Window.size = (1245, 700)
 
 from subprocess import check_output
 myip = str(check_output(['hostname', '--all-ip-addresses']))
