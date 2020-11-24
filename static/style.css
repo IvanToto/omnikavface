@@ -1,0 +1,15 @@
+body {
+    background: #ef7a85;
+    color: #8b290a;
+}
+.button {
+  font: bold 15px Arial;
+  text-decoration: none;
+  background-color: #EEEEEE;
+  color: #333333;
+  padding: 2px 6px 2px 6px;
+  border-top: 4px solid #CCCCCC;
+  border-right: 4px solid #333333;
+  border-bottom: 4px solid #333333;
+  border-left: 4px solid #CCCCCC;
+}
