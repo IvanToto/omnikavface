@@ -1,0 +1,57 @@
+1.-Funcion cancelar durante captura 
+
+#Incluir la siguienre rutina en la clase Fourthwindows
+
+def panstate3(self,dt):
+        global btn2
+        global tempg
+        if btn2 == '1':
+            btn2 = '0'
+            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END ID
+            self.cam.stop()
+            self.botoni4.text = 'Check-In'
+            self.botonc4.text = 'Main'
+            self.botond4.text = 'Repetir'
+            self.ids.idcapnow.text = ''
+            self.img2.source = 'check4.png' 
+            self.ids.idcapnow.focus = True
+            facemask = 3
+            if not tempg == '0.0':
+                        self.lab4.text = 'Temperatura: '+ tempg + '°C     Bienvenido :)'
+                        self.lab4.font_size = 60
+                        tempg = '0.0'
+            Clock.unschedule(self.panstate3)
+            Clock.schedule_interval(self.panstate, 0.1)
+
+
+
+incluri en buildcam: 
+        MainWindow.serialTemp()
+        self.botonc4.text = 'Cancelar'
+        Clock.schedule_interval(self.panstate3, 0.1)
+
+incluir en caputura en if (self.count2>2 and Id[1]<50 and facemask == 2): 
+                    
+        Clock.unschedule(self.panstate3)
+
+incluir el archivo check04.png
+
+2.-Cambiar CascadeMultiscale de 1.5 a 1.3 y la sensibilidad a 80
+
+3.-Borra ide al hacer check in, añador en las rutinas checkindone y newindone al final las siguiente linea
+self.ids.idcapnow.text = ''
+self.ids.idcapnow.focus = True
+
+4.-Cambiar la condicion completa de button 1 en panstate en Fourthwindow
+
+if btn1 == '1':
+            if self.ids.idcapnow.text in self.User_active:
+                btn1 = 0
+                self.checkindone()
+                self.ids.idcapnow.focus = True
+                Clock.unschedule(self.panstate)
+            else:
+                self.lab4.text = 'Usuario no activo'
+                self.ids.idcapnow.text = ''
+                self.img2.source = 'check4.png'
+                btn1 = 0
