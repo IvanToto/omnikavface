@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+   <head>
+      <title>Omnikav</title>
+      <link rel="stylesheet" href='../static/style.css'/>
+   </head>
+   <body>
+        <h1>KIOSKO OMNIKAV</h1>
+        <h2> Operaciones </h2>
+        <h3> 
+            Nuevo Registro: 
+            <a href="/capture/0" class="button">Iniciar Captura</a>
+            estado {{ ah  }}
+        </h3>
+        <h3> 
+            Sobreescribir Registro: 
+            <a href="/newuser/0" class="button">-o-</a>  
+        </h3>
+        <h3> 
+            Actualizar: 
+            <a href="/end/0" class="button">Terminar</a>  
+        </h3>
+        <h3> 
+                <p>
+              <label>User ID</label>
+              <input type = "text"
+                 id = "myText"
+                 value = "id" />
+                </p>
+        </h3>
+        
+        <br>
+        
+        
+        
+        <h2> ESTADO ACTUAL DEL QUIOSCO </h2>
+        <h3> Usuarios Pendientes:  {{ bh  }}</h3>
+        <h3> Usuarios Registrados:  {{ ch  }}</h3>
+        <h3> Diganostico:  {{ dh  }}</h3>
+        <h3> Bugs:  {{ eh  }}</h3>
+        
+        
+
+        
+   </body>
+</html>
