@@ -1,45 +1,76 @@
 <!DOCTYPE html>
    <head>
-      <title>Omnikav</title>
+      <title>OMNIFACE_System</title>
       <link rel="stylesheet" href='../static/style.css'/>
+   
    </head>
    <body>
-        <h1>KIOSKO OMNIKAV</h1>
-        <h2> Operaciones </h2>
-        <h3> 
-            Nuevo Registro: 
-            <a href="/capture/0" class="button">Iniciar Captura</a>
-            estado {{ ah  }}
-        </h3>
-        <h3> 
-            Sobreescribir Registro: 
-            <a href="/newuser/0" class="button">-o-</a>  
-        </h3>
-        <h3> 
-            Actualizar: 
-            <a href="/end/0" class="button">Terminar</a>  
-        </h3>
-        <h3> 
-                <p>
-              <label>User ID</label>
-              <input type = "text"
-                 id = "myText"
-                 value = "id" />
-                </p>
-        </h3>
         
+        
+        <div id = demoObject>
+          
+        <h1>Configuraciones OMNIFACE</h1>
         <br>
         
+        <h3> 
+            <p>
+              <label>ID del Disposito</label>
+              <input type = "text" id = "inputId" value = {{ah}} />
+              <a href="" class="button" id="getId" >Actualizar Id</a>
+            </p>
+        </h3>
+        <h3> 
+            <p>
+              <label>Key del dispositivo</label>
+              <input type = "text" id = "inputKey" value = {{bh}} />
+              <a href="" class="button" id="getKey">Actualizar Key</a>  
+            </p>
+        </h3>
+        <h3> 
+            Confirmar y guardar Cambios: 
+            <a href="" class="button" id="saveChanges">Guardar</a>  
+        </h3>
+        <br>
+  
+        <h2> ESTADO DE VARIABLES </h2>
+        <h3> Nueva Id actualizada: {{ah}}</h3>
+        <h3> Nueva Key actualizada: {{bh}}</h3>
+        <h3> Acción Solicitada: {{ch}}</h3>
+        <h3> Valor de la acción: {{dh}}</h3>
+        <h3> Bugs: {{eh}}</h3>
         
+        </div>
         
-        <h2> ESTADO ACTUAL DEL QUIOSCO </h2>
-        <h3> Usuarios Pendientes:  {{ bh  }}</h3>
-        <h3> Usuarios Registrados:  {{ ch  }}</h3>
-        <h3> Diganostico:  {{ dh  }}</h3>
-        <h3> Bugs:  {{ eh  }}</h3>
-        
-        
-
+        <script>
+          document.getElementById("getId").addEventListener('click',(event)=>{
+            event.preventDefault();
+            let mainIP = window.location.href.split("/")
+            let inputId = document.getElementById("inputId").value 
+            console.log('La nueva Id es: ',inputId);
+            let newLink = mainIP[0]+'/'+'setId'+'/'+inputId;
+            console.log(newLink);
+            window.location.href = newLink;
+            })
+            
+          document.getElementById("getKey").addEventListener('click',(event)=>{
+            event.preventDefault();
+            let mainIP = window.location.href.split("/")
+            let inputKey = document.getElementById("inputKey").value 
+            console.log('La nueva Key es: ',inputId);
+            let newLink = mainIP[0]+'/'+'setKey'+'/'+inputKey;
+            console.log(newLink);
+            window.location.href = newLink;
+            })
+            
+          document.getElementById("saveChanges").addEventListener('click',(event)=>{
+            event.preventDefault();
+            let mainIP = window.location.href.split("/")
+            let newLink = mainIP[0]+'/'+'save'+'/'+'1';
+            console.log(newLink);
+            window.location.href = newLink;
+            })
+             
+        </script>
         
    </body>
 </html>
