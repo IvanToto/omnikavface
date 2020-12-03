@@ -36,10 +36,11 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'userCheckInScreen'
                       
-            
-        Label:
-            font_size: 60
-            text: 'BIENVENIDO'
+        BoxLayout:
+            orientation: "horizontal"    
+            Label:
+                font_size: 60
+                text: 'BIENVENIDO'
 
         
         BoxLayout:
@@ -77,6 +78,7 @@
 
 <userListScreen>:
     userList:userListK
+    label08:label08K
     label09:label09K
     on_enter:
         root.drawPendingUserList()
@@ -99,14 +101,10 @@
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'userPreCaptureScreen'
             Label:
-                font_size: 10
-                text: '--'
-                canvas.before:
-                    Color:
-                        rgba: 191/255.0, 144/255.0, 63/255.0, 1
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos        
+                id: label08K
+                font_size: 22
+                text: ''
+                     
             Button:
                 text: 'Regresar a Main'
                 size_hint: None, None

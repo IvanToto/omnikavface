@@ -35,9 +35,9 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import argparse
 
-Window.fullscreen = True
+#Window.fullscreen = True
 #Window.size = (1245, 700)
-#Window.size = (720, 480)
+Window.size = (720, 480)
 Builder.load_file("windows.kv")
 
 #VARIABLES GLOBALES 
@@ -69,62 +69,68 @@ print(MyDbId)
 print(MyDbKey)
 
 
-'''
-#Construcción de Servidor------------------------------------------------------------------------------------
+#CONSTRUCCION DE SERVIDOR -------------------------------------------------------------------------------
+#Definicion de instancia de Servidor
 from flask import Flask, render_template, request
 server = Flask(__name__)
 
-#Verificación de IP -----------------------------------------------------------------------------------------
+#Verificación de IP
 from subprocess import check_output
 myip = str(check_output(['hostname', '--all-ip-addresses']))
 myip = myip.replace("'", " ").split(" ")
 print (myip[1])
 MyHost = myip[1]
 
-#SERVIDOR EN PARALELO---------------------------------------------------------------------------------------
+#Generación de SERVIDRO ---------------------------------------
 @server.route("/")
 def index():
-    a = 1
-    b = 1
+    a = MyDbId
+    b = MyDbKey
     c = 1
     d = 1
     e = 1
     templateData = {'ah':a,'bh':b,'ch':c,'dh':d,'eh':e,}
     return render_template('index.html', **templateData)
     
-@server.route("/<deviceName>/<action>")
-def action(deviceName, action):
-    global k
-    global weborder
-    global webid
-    print(deviceName)
-    print(action)
-    weborder = deviceName
-    webid = action
+@server.route("/<action>/<actionValue>")
+def action(action,actionValue):
+    global MyDbId
+    global MyDbKey
     
-    if action == "0":
-        k = k + 1
+    if(action == 'setId'):
+        MyDbId = actionValue
+        print('Id Nueva Actualizada a: ')
+        print(MyDbId)
+        
+    if(action == 'setKey'):
+        MyDbKey = actionValue
+        print('Key Nueva Actualizada a: ')
+        print(MyDbKey)
     
-    a = 1 + k
-    b = 1 + k
-    c = 1 + k
-    d = 1 + k
-    e = 1 + k
+    if(action == 'save'):
+        newProps = {"Id":MyDbId,"Key":MyDbKey}
+        propsFile = open('propiedades.json', 'w')
+        json.dump(newProps,propsFile, ensure_ascii=False) 
+        propsFile.close()
+        print('PROPIEDADES ACTUALIZADAS')
+    
+    a = MyDbId
+    b = MyDbKey
+    c = action
+    d = actionValue
+    e = 1
+    
     templateData = {'ah':a,'bh':b,'ch':c,'dh':d,'eh':e,}
     return render_template('index.html', **templateData)
 
 def start_server():
     print("Iniciando Servidor...")
     server.run(debug=False,port=5000,host=MyHost)
+    print("SERVIDOR INICIALIZADO -------------- :D")
     
-#SERVIDOR ----------------------------------------------------------------------
-'''
+#Cierre de Construcción de SERVIDOR ----------------------------------------------------------------------
 
-
-
-
-#CLASE DE VENTAS----------------------------------------------------------------
-
+    
 class MainScreen(Screen):
     hue = NumericProperty(0)
     def endApp(self):
@@ -174,10 +180,12 @@ class RV(RecycleView):
 class userListScreen(Screen):
     userList = ObjectProperty(None)
     label09 = ObjectProperty(None)
+    label08 = ObjectProperty(None)
     global pendingUserList
     
     def drawPendingUserList(self):
         print('HA ACTUALIZADO RV SCREEN')
+        self.label08.text = 'Tu IP:  '+MyHost +':5000'
         self.label09.text = 'Actualizando base de usuarios...'
         OMNIApp().updateUsers()
         self.userList.data = pendingUserList
@@ -622,11 +630,9 @@ class OMNIApp(App):
         dbRequest = ''
         try:
             url = 'https://us-central1-omnikav-dashboard.cloudfunctions.net/readDevice'
-            dataout = {'Id':MyDbId,'Key':MyDbKey,'user_Id':Id,'user_Temp':userTemp,'user_Count':flow,'sys_Temp':'35.5','sys_Hum':'25','sys_Day':'Nan','sys_Hour':'Nan'}
+            dataout = {'Id':MyDbId,'Key':MyDbKey,'userId':Id,'user_temp':userTemp,'user_count':flow,'sys_temp':'35.5','sys_hum':'25'}
             r = requests.post(url = url, headers = {'accept': 'application/json'}, data = dataout,timeout=(0.5,3))
-            data = r.json()
             print(r)
-            print(data)
             dbRequest = 'PASS'
         except requests.exceptions.ReadTimeout:
             print ('No se pudo actualiza el usuario, ocurrio ReadTimeout')
@@ -670,7 +676,9 @@ class OMNIApp(App):
         ser.write(command.encode('utf-8'))
                
 if __name__ == '__main__':
-    #threading.Thread(target=start_server).start()  #inicializa servidor web en un segundo hilo
+    t1 = threading.Thread(target=start_server)  #inicializa servidor web en un segundo hilo
+    t1.daemon = True
+    t1.start()
     SERIAL_PORT = '/dev/ttyUSB0'
     SERIAL_RATE = 115200 
     ser = serial.Serial(SERIAL_PORT, SERIAL_RATE) #inicializa comunicacion serial UART
