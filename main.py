@@ -270,6 +270,7 @@ class userCaptureScreen(Screen):
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.cam = cv2.VideoCapture(0)
         Clock.schedule_interval(self.newfaceupdateprepare, 1.0/24.0) #1/33.0 es un Frame Rate de 33 por segundo
+        OMNIApp().serialLampOn()
         print("READFACE Start-----------------------------------------")
         self.count = 0     # Initialize sample face image
         self.timer = 0
@@ -312,7 +313,6 @@ class userCaptureScreen(Screen):
             self.timer2 = 0
             Clock.unschedule(self.newfaceupdateprepare)
             Clock.schedule_interval(self.newfaceupdate, 1.0/24.0) #1/33.0 es un Frame Rate de 33 por segundo
-            OMNIApp().serialLampOn()
     
     def newfaceupdate(self, dt):
         
@@ -351,6 +351,7 @@ class userCaptureScreen(Screen):
             self.closeprocess()
             self.newface()
             self.parent.current = 'userPreCaptureScreen' #Retorna a la ventan anterior al terminar
+            OMNIApp().serialLampOff()
             
             #MainWindow.saveFace(currentregister)
             #kv.current = "lista"
@@ -414,7 +415,7 @@ class userCheckInScreen(Screen):
         #time.sleep(1.0)
         self.cam = PiVideoStream().start()
         time.sleep(0.5)
-        #OMNIApp().serialLampOn()
+        OMNIApp().serialLampOn()
         OMNIApp().serialUserTemp()
         #MainWindow.serialLamp()
         #MainWindow.serialTemp()
@@ -440,7 +441,7 @@ class userCheckInScreen(Screen):
         cv2.rectangle(frame,(560,0), (640,480), (0,0,0), -1) #Dibuja Barras Negras a los lados de la captura
         gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)          # Convert the captured frame into grayscale
         faces = self.faceCascade.detectMultiScale(gray, 1.3,5) # Get all face from the video frame
-        mouth_rects = self.mouth_cascade.detectMultiScale(gray, 1.3, 5)
+        #mouth_rects = self.mouth_cascade.detectMultiScale(gray, 1.3, 5)
         # For each face in faces
         if len(faces) == 0: #la variable faces es un arreglo [], esta vacio cuando no hay caras detectadas. 
             print("----SIN CARAS----")
@@ -450,8 +451,8 @@ class userCheckInScreen(Screen):
             for(x,y,w,h) in faces:
                 cv2.rectangle(frame, (x-20,y-20), (x+w+20,y+h+20), (121,210,121), 4) #DIBUJA UN RECTANGULO EN frame, para face
                 Id = self.recognizer.predict(gray[y:y+h,x:x+w]) # Crea Id Recognize the face belongs to which ID
+                mouth_rects = self.mouth_cascade.detectMultiScale(gray[y:y+h,x:x+w], 1.3, 5)
                 print (Id)
-                
                 if(len(mouth_rects) == 0):
                     facemask = 1
                     print('Bien, tienes cubreboca')
@@ -460,8 +461,8 @@ class userCheckInScreen(Screen):
                     cv2.putText(frame,'USE CUBREBOCAS', (x-20,y-40), self.font, 1, (250,250,250), 2)
                     print('MAL, no tienes cubreboca')
                     for (mx, my, mw, mh) in mouth_rects:
-                        if(my > 0.9*h and y < my < y + h):
-                            cv2.rectangle(frame, (mx, my), (mx + mw, my + mh), (0,0,225), 3)
+                        #if(my > 0.9*h and y < my < y + h):
+                        cv2.rectangle(frame, (x+mx,y+my), (x+mx+mw,y+my+mh), (0,0,225), 3)
 
                 if(facemask == 1):
                     self.count2 += 1
@@ -472,7 +473,8 @@ class userCheckInScreen(Screen):
                         cv2.putText(frame,rostro, (x-20,y-40), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
                         if (self.count2>3):
                             UserId = self.User_Ids[str(Id[0])]
-                            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END ID
+                            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END Detection with user
+                            OMNIApp().serialLampOff()
                             self.cam.stop()
                             facemask = 0
                             Clock.schedule_interval(self.botonAirCheck, 0.1)
@@ -500,7 +502,8 @@ class userCheckInScreen(Screen):
                         cv2.rectangle(frame, (x-40,y-90), (x+w+40, y-22), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID
                         cv2.putText(frame, "No identificado", (x-20,y-40), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID       
                         if (self.count2>20):
-                            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END ID
+                            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END Detection without Identification
+                            OMNIApp().serialLampOn()
                             self.cam.stop()
                             facemask = 0
                             Clock.schedule_interval(self.botonAirCheck, 0.1)
@@ -668,7 +671,11 @@ class OMNIApp(App):
         ser.write(command.encode('utf-8'))
         
     def serialLampOn(self): 
-        command = "d"
+        command = "k"
+        ser.write(command.encode('utf-8'))
+        
+    def serialLampOff(self): 
+        command = "l"
         ser.write(command.encode('utf-8'))
     
     def serialPumpOn(self): 
