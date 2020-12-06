@@ -459,7 +459,7 @@ class userCheckInScreen(Screen):
                     self.facemask += 1
                 else:
                     for (mx, my, mw, mh) in mouth_rects:
-                        if(my > 0.6*h and self.facemask<5):
+                        if(my > 0.6*h and self.facemask<3):
                             cv2.rectangle(frame, (x+mx,y+my), (x+mx+mw,y+my+mh), (0,0,225), 3)
                             cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (0,0,225), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
                             cv2.putText(frame,"SIN CUBREBOCA", (x-30,y+h+30), self.font, 1, (250,250,250), 2)  #Dibuja Texto con ID
@@ -468,52 +468,53 @@ class userCheckInScreen(Screen):
                             cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
                             cv2.putText(frame,"CON CUBREBOCA", (x-30,y+h+30), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
                             
-                self.count2 += 1
-                #USUARIO IDENTIFICADO
-                if (Id[1]<70): #Id[1] es la precisión de la detección                    
-                    rostro = self.User_check[str(Id[0])]
-                    cv2.rectangle(frame, (x-40,y-90), (x+w+40, y-22), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID
-                    cv2.putText(frame,rostro, (x-20,y-40), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
-                    
-                    if (self.count2>12):
-                        UserId = self.User_Ids[str(Id[0])]
-                        Clock.unschedule(self.readfaceupdate)  #<<---------------------------END Detection with user
-                        OMNIApp().serialLampOff()
-                        self.cam.stop()
-                        self.facemask = 0
-                        Clock.schedule_interval(self.botonAirCheck, 0.1)
-                        self.count2 = 0;
-                        newFlow = int(flowCounter)+1
-                        flowCounter = str(newFlow)
-                        #temp = 0.4835*float(userSig)-126.15+0.2*float(userDist)
-                        temp = 0.4*float(userSig)-95+0.05*float(userDist)
-                        if (temp<35.0):
-                            temp=35.0
-                        tempr = round(temp,2)
-                        userTemp = str(tempr)
-                        OMNIApp().serialPumpOn()
-                        OMNIApp().userCheckIn(UserId,flowCounter)
-                        if (dbRequest == 'PASS'):
-                            if(float(userTemp)<38):
-                                self.label12.text = 'Acceso Exitoso, su temperatura es:'+userTemp+'°C'
-                            else: 
-                                self.label12.text = 'Temperatura Alta: '+userTemp+'°C, Administrador notificado'
+                if(self.facemask>3):
+                    self.count2 += 1
+                    #USUARIO IDENTIFICADO
+                    if (Id[1]<70): #Id[1] es la precisión de la detección                    
+                        rostro = self.User_check[str(Id[0])]
+                        cv2.rectangle(frame, (x-40,y-90), (x+w+40, y-22), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID
+                        cv2.putText(frame,rostro, (x-20,y-40), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
+                        
+                        if (self.count2>4):
+                            UserId = self.User_Ids[str(Id[0])]
+                            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END Detection with user
+                            OMNIApp().serialLampOff()
+                            self.cam.stop()
+                            self.facemask = 0
+                            Clock.schedule_interval(self.botonAirCheck, 0.1)
+                            self.count2 = 0;
+                            newFlow = int(flowCounter)+1
+                            flowCounter = str(newFlow)
+                            #temp = 0.4835*float(userSig)-126.15+0.2*float(userDist)
+                            temp = 0.4*float(userSig)-95+0.05*float(userDist)
+                            if (temp<35.0):
+                                temp=35.0
+                            tempr = round(temp,2)
+                            userTemp = str(tempr)
+                            OMNIApp().serialPumpOn()
+                            OMNIApp().userCheckIn(UserId,flowCounter)
+                            if (dbRequest == 'PASS'):
+                                if(float(userTemp)<38):
+                                    self.label12.text = 'Acceso Exitoso, su temperatura es:'+userTemp+'°C'
+                                else: 
+                                    self.label12.text = 'Temperatura Alta: '+userTemp+'°C, Administrador notificado'
+                                    
+                            else:
+                                self.label12.text = 'No se pudo registrar su acceso, vuelva a checar'
                                 
-                        else:
-                            self.label12.text = 'No se pudo registrar su acceso, vuelva a checar'
-                            
-                #USUARIO NO IDENTIFICADO
-                else:
-                    cv2.rectangle(frame, (x-40,y-90), (x+w+40, y-22), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID
-                    cv2.putText(frame, "No identificado", (x-20,y-40), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID       
-                    
-                    if (self.count2>30):
-                        Clock.unschedule(self.readfaceupdate)  #<<---------------------------END Detection without Identification
-                        OMNIApp().serialLampOn()
-                        self.cam.stop()
-                        self.facemask = 0
-                        Clock.schedule_interval(self.botonAirCheck, 0.1)
-                        self.count2 = 0;
+                    #USUARIO NO IDENTIFICADO
+                    else:
+                        cv2.rectangle(frame, (x-40,y-90), (x+w+40, y-22), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID
+                        cv2.putText(frame, "No identificado", (x-20,y-40), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID       
+                        
+                        if (self.count2>20):
+                            Clock.unschedule(self.readfaceupdate)  #<<---------------------------END Detection without Identification
+                            OMNIApp().serialLampOn()
+                            self.cam.stop()
+                            self.facemask = 0
+                            Clock.schedule_interval(self.botonAirCheck, 0.1)
+                            self.count2 = 0;
                         
         #convierte frame a una textura para enviarla a KiVy
         frame = cv2.flip(frame, 0)
