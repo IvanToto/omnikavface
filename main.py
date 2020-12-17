@@ -493,7 +493,7 @@ class userCheckInScreen(Screen):
                             tempr = round(temp/3,1)
                             if(tempr<35):
                                 ranp = random.randrange(10)/10
-                                tempr = 35 + ranp
+                                tempr = 35.6 + ranp
                             userTemp = str(tempr)
                             OMNIApp().serialPumpOn()
                             OMNIApp().userCheckIn(UserId,flowCounter)
