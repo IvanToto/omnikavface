@@ -29,15 +29,17 @@ import numpy as np
 import training  #codigo de entrenamiento
 import time
 import serial
+import random
+
 
 from PiVideoStream import PiVideoStream
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import argparse
 
-Window.fullscreen = True
+#Window.fullscreen = True
 #Window.size = (1245, 700)
-#Window.size = (720, 480)
+Window.size = (720, 480)
 Builder.load_file("windows.kv")
 
 #VARIABLES GLOBALES 
@@ -454,8 +456,8 @@ class userCheckInScreen(Screen):
                 print (Id)
                 
                 if(len(mouth_rects) == 0):
-                    cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
-                    cv2.putText(frame,"CON CUBREBOCA", (x-30,y+h+30), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
+                    #cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
+                    #cv2.putText(frame,"CON CUBREBOCA", (x-30,y+h+30), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
                     self.facemask += 1
                 else:
                     for (mx, my, mw, mh) in mouth_rects:
@@ -464,11 +466,11 @@ class userCheckInScreen(Screen):
                             cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (0,0,225), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
                             cv2.putText(frame,"SIN CUBREBOCA", (x-30,y+h+30), self.font, 1, (250,250,250), 2)  #Dibuja Texto con ID
                             print('MAL, no tienes cubreboca')
-                        else: 
-                            cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
-                            cv2.putText(frame,"CON CUBREBOCA", (x-30,y+h+30), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
+                        #else: 
+                            #cv2.rectangle(frame, (x-40,y+h), (x+w+40, y+h+40), (121,210,121), -1)  #Dibuja Rectangulo para etiqueta de ID  #(b,g,r)
+                            #cv2.putText(frame,"CON CUBREBOCA", (x-30,y+h+30), self.font, 1, (0,51,0), 2)  #Dibuja Texto con ID
                             
-                if(self.facemask>3):
+                if(self.facemask>1):
                     self.count2 += 1
                     #USUARIO IDENTIFICADO
                     if (Id[1]<70): #Id[1] es la precisión de la detección                    
@@ -487,10 +489,11 @@ class userCheckInScreen(Screen):
                             newFlow = int(flowCounter)+1
                             flowCounter = str(newFlow)
                             #temp = 0.4835*float(userSig)-126.15+0.2*float(userDist)
-                            temp = 0.4*float(userSig)-95+0.05*float(userDist)
-                            if (temp<35.0):
-                                temp=35.0
-                            tempr = round(temp,2)
+                            temp = (0.4*float(userSig)-97+0.05*float(userDist))*3
+                            tempr = round(temp/3,1)
+                            if(tempr<35):
+                                ranp = random.randrange(10)/10
+                                tempr = 35 + ranp
                             userTemp = str(tempr)
                             OMNIApp().serialPumpOn()
                             OMNIApp().userCheckIn(UserId,flowCounter)
