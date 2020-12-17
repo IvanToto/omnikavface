@@ -37,9 +37,9 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import argparse
 
-#Window.fullscreen = True
+Window.fullscreen = True
 #Window.size = (1245, 700)
-Window.size = (720, 480)
+#Window.size = (720, 480)
 Builder.load_file("windows.kv")
 
 #VARIABLES GLOBALES 
